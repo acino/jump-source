@@ -1,0 +1,62 @@
+{
+    "name": "jump-source",
+    "displayName": "jump-source for VS Code",
+    "description": "Jumps between source file and test file.",
+    "publisher": "Acino",
+    "version": "1.0.0",
+    "engines": {
+        "vscode": "^1.29.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:extension.jumpSource"
+    ],
+    "main": "./out/extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.jumpSource",
+                "title": "Jump source"
+            }
+        ],
+        "keybindings": [
+          {
+            "command": "extension.jumpSource",
+            "key": "ctrl+o t",
+            "when": "editorIsOpen"
+          }
+        ],
+        "configuration": {
+          "type": "object",
+          "title": "jumpSource configuration",
+          "properties": {
+            "jumpSource.testFileSuffix": {
+              "type": "string",
+              "default": "test",
+              "description": "Suffix to append to source file name before the file extension."
+            },
+            "jumpSource.testSubFolder": {
+              "type": "string",
+              "default": "tests",
+              "description": "Name of sub folder containing tests (may be empty)"
+            }
+          }
+        }
+    },
+    "scripts": {
+        "vscode:prepublish": "npm run compile",
+        "compile": "tsc -p ./",
+        "watch": "tsc -watch -p ./",
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "npm run compile && node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^3.1.4",
+        "vscode": "^1.1.25",
+        "tslint": "^5.8.0",
+        "@types/node": "^8.10.25",
+        "@types/mocha": "^2.2.42"
+    }
+}
