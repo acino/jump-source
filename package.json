@@ -1,15 +1,25 @@
 {
     "name": "jump-source",
     "displayName": "jump-source for VS Code",
-    "description": "Jumps between source file and test file.",
+    "version": "1.0.1",
     "publisher": "Acino",
-    "version": "1.0.0",
-    "engines": {
-        "vscode": "^1.29.0"
+    "description": "Jumps between source file and test file.",
+    "author": {
+      "name": "Peter Spegel"
     },
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/acino/jump-source.git"
+    },
+    "homepage": "https://github.com/acino/jump-source",
     "categories": [
         "Other"
     ],
+    "keywords": ["jump to test", "go to test", "switch to test", "open test"],
+    "icon": "images/logo.png",
+    "engines": {
+        "vscode": "^1.29.0"
+    },
     "activationEvents": [
         "onCommand:extension.jumpSource"
     ],
