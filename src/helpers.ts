@@ -31,18 +31,16 @@ export const getClosestIndexFilePaths = async (currentFilePath: string) => {
     dirPath = getParentDir(dirPath);
   }
 
-  const relativePath = vscode.workspace.asRelativePath(dirPath);
+  const pattern = new vscode.RelativePattern(dirPath, "index.*");
 
-  const absolutePaths = await vscode.workspace
-    .findFiles(`${relativePath}/index.*`)
-    .then(files =>
-      files
-        .map(file => file.fsPath)
-        .filter(absolutePath => {
-          const filename = basename(absolutePath);
-          return /^index\.[^\.]+$/.test(filename);
-        })
-    );
+  const absolutePaths = await vscode.workspace.findFiles(pattern).then(files =>
+    files
+      .map(file => file.fsPath)
+      .filter(absolutePath => {
+        const filename = basename(absolutePath);
+        return /^index\.[^\.]+$/.test(filename);
+      })
+  );
 
   return absolutePaths;
 };

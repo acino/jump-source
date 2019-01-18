@@ -46,6 +46,10 @@ The extension will jump to the index file of the current folder. If the active f
 
 Releases of jumpSource for VS Code.
 
+### 1.1.1
+
+Performance fix for jump to index file.
+
 ### 1.1.0
 
 Adds support for jumping to the closest index file.
