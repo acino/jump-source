@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### 1.1.0
+
+Adds support for jumping to the closest index file.
+
 ## 1.0.1
 
 Adds logo and keywords.

@@ -1,5 +1,5 @@
 import * as vscode from "vscode";
-import { dirname, basename, join, sep } from "path";
+import { dirname, basename, join, sep, relative } from "path";
 
 const EXTENSION_NAME = "jumpSource";
 const CONF_TEST_FILE_SUFFIX = "testFileSuffix";
@@ -22,6 +22,29 @@ export const getCorrespondingTestFilePath = (sourceFilePath: string) => {
   const testFilename = addTestSuffix(basename(sourceFilePath));
 
   return join(testDir, testFilename);
+};
+
+export const getClosestIndexFilePaths = async (currentFilePath: string) => {
+  let dirPath = dirname(currentFilePath);
+  const nameOfDir = basename(dirPath);
+  if (nameOfDir === getTestSubFolderName()) {
+    dirPath = getParentDir(dirPath);
+  }
+
+  const relativePath = vscode.workspace.asRelativePath(dirPath);
+
+  const absolutePaths = await vscode.workspace
+    .findFiles(`${relativePath}/index.*`)
+    .then(files =>
+      files
+        .map(file => file.fsPath)
+        .filter(absolutePath => {
+          const filename = basename(absolutePath);
+          return /^index\.[^\.]+$/.test(filename);
+        })
+    );
+
+  return absolutePaths;
 };
 
 export const openNewTab = (filePath: string) => {

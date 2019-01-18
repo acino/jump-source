@@ -1,6 +1,11 @@
 # jump-source for VS Code
 
-This extension adds a shortcut to quickly switch to the corresponding test file for a source file and vice versa.
+This extension adds multiple shortcuts for quickly jumping between source files and test files.
+
+It enables you to:
+
+- Quickly switch to the corresponding test file for a source file and vice versa.
+- Go to the closest index source file.
 
 ## Features
 
@@ -25,12 +30,25 @@ Set `jumpSource.testSubFolder` to empty string if your tests reside within the s
 
 ## Usage
 
+### Jumping between source file and test file
+
 1. Open a source file that has a corresponding test file, or a test file.
-2. Open the command palette with Ctrl + Shift + P and choose the `jumpSource` command. You may also use the keyboard shortcut Ctrl + O T.
+2. Open the command palette with Ctrl + Shift + P and choose the Jump to/from test command. You may also use the keyboard shortcut Ctrl + O T.
+
+### Jumping to the closest index file
+
+1. Open a source file och test file.
+2. Open the command palette with Ctrl + Shift + P and choose the Jump to index file command. You may also use the keyboard shortcut Ctrl + O I.
+
+The extension will jump to the index file of the current folder. If the active file is in the test sub folder it will jump to the index file in the parent folder.
 
 ## Release Notes
 
 Releases of jumpSource for VS Code.
+
+### 1.1.0
+
+Adds support for jumping to the closest index file.
 
 ### 1.0.1
 

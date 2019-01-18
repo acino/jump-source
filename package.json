@@ -1,9 +1,9 @@
 {
     "name": "jump-source",
     "displayName": "jump-source for VS Code",
-    "version": "1.0.1",
+    "version": "1.1.0",
     "publisher": "Acino",
-    "description": "Jumps between source file and test file.",
+    "description": "Shortcuts to jump between source files and test files",
     "author": {
       "name": "Peter Spegel"
     },
@@ -21,20 +21,30 @@
         "vscode": "^1.29.0"
     },
     "activationEvents": [
-        "onCommand:extension.jumpSource"
+        "onCommand:extension.jumpTest",
+        "onCommand:extension.jumpIndex"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.jumpSource",
-                "title": "Jump source"
-            }
+                "command": "extension.jumpTest",
+                "title": "Jump to/from test"
+            },
+            {
+              "command": "extension.jumpIndex",
+              "title": "Jump to index file"
+          }
         ],
         "keybindings": [
           {
-            "command": "extension.jumpSource",
+            "command": "extension.jumpTest",
             "key": "ctrl+o t",
+            "when": "editorIsOpen"
+          },
+          {
+            "command": "extension.jumpIndex",
+            "key": "ctrl+o i",
             "when": "editorIsOpen"
           }
         ],

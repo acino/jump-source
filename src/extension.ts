@@ -4,7 +4,8 @@ import {
   isTest,
   getCorrespondingTestFilePath,
   openNewTab,
-  getCorrespondingSourceFilePath
+  getCorrespondingSourceFilePath,
+  getClosestIndexFilePaths
 } from "./helpers";
 
 // this method is called when your extension is activated
@@ -13,19 +14,34 @@ export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with  registerCommand
   // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand(
-    "extension.jumpSource",
-    () => {
-      // The code you place here will be executed every time your command is executed
+  let disposable = vscode.commands.registerCommand("extension.jumpTest", () => {
+    // The code you place here will be executed every time your command is executed
 
+    const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
+
+    if (isTest(activeFilePath)) {
+      const sourceFilePath = getCorrespondingSourceFilePath(activeFilePath);
+      openNewTab(sourceFilePath);
+    } else {
+      const testFilePath = getCorrespondingTestFilePath(activeFilePath);
+      openNewTab(testFilePath);
+    }
+  });
+
+  context.subscriptions.push(disposable);
+
+  disposable = vscode.commands.registerCommand(
+    "extension.jumpIndex",
+    async () => {
       const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
+      const indexFilePaths = await getClosestIndexFilePaths(activeFilePath);
 
-      if (isTest(activeFilePath)) {
-        const sourceFilePath = getCorrespondingSourceFilePath(activeFilePath);
-        openNewTab(sourceFilePath);
+      if (indexFilePaths.length === 0) {
+        vscode.window.showErrorMessage(`Couldn't find an index file`);
+      } else if (indexFilePaths.length === 1) {
+        openNewTab(indexFilePaths[0]);
       } else {
-        const testFilePath = getCorrespondingTestFilePath(activeFilePath);
-        openNewTab(testFilePath);
+        vscode.window.showErrorMessage(`Found multiple index files`);
       }
     }
   );
