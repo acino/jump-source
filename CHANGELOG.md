@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### 1.2.0
+
+Adds support for listing all index files in the workspace with filtering capabilities.
+
 ### 1.1.1
 
 Performance fix for jump to index file.

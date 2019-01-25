@@ -1,7 +1,7 @@
 {
     "name": "jump-source",
     "displayName": "jump-source for VS Code",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "publisher": "Acino",
     "description": "Shortcuts to jump between source files and test files",
     "author": {
@@ -22,18 +22,23 @@
     },
     "activationEvents": [
         "onCommand:extension.jumpTest",
-        "onCommand:extension.jumpIndex"
+        "onCommand:extension.jumpIndex",
+        "onCommand:extension.listIndex"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
-            {
-                "command": "extension.jumpTest",
-                "title": "Jump to/from test"
-            },
-            {
-              "command": "extension.jumpIndex",
-              "title": "Jump to index file"
+          {
+              "command": "extension.jumpTest",
+              "title": "Jump to/from test"
+          },
+          {
+            "command": "extension.jumpIndex",
+            "title": "Jump to index file"
+          },
+          {
+            "command": "extension.listIndex",
+            "title": "List index files"
           }
         ],
         "keybindings": [
@@ -46,6 +51,10 @@
             "command": "extension.jumpIndex",
             "key": "ctrl+o i",
             "when": "editorIsOpen"
+          },
+          {
+            "command": "extension.listIndex",
+            "key": "ctrl+o l"
           }
         ],
         "configuration": {
@@ -60,7 +69,17 @@
             "jumpSource.testSubFolder": {
               "type": "string",
               "default": "tests",
-              "description": "Name of sub folder containing tests (may be empty)"
+              "description": "Name of sub folder containing tests (may be empty)."
+            },
+            "jumpSource.filterCaseSensitive": {
+              "type": "boolean",
+              "default": true,
+              "description": "Used when index files are listed. When set to true the filter will exclude results with the wrong case."
+            },
+            "jumpSource.excludePattern": {
+              "type": "string",
+              "default": "**/node_modules/**",
+              "description": "Used when index files are listed. This glob pattern is ignored in the file search."
             }
           }
         }

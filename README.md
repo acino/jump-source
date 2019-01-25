@@ -6,6 +6,7 @@ It enables you to:
 
 - Quickly switch to the corresponding test file for a source file and vice versa.
 - Go to the closest index source file.
+- List all index files in the workspace.
 
 ## Features
 
@@ -23,8 +24,10 @@ Example:
 
 This extension contributes the following settings:
 
-- `jumpSource.testFileSuffix`: suffix to append to source file name before the file extension (default: test).
-- `jumpSource.testSubFolder`: name of sub folder containing tests (default: tests).
+- `jumpSource.testFileSuffix`: Suffix to append to source file name before the file extension (default: test).
+- `jumpSource.testSubFolder`: Name of sub folder containing tests (default: tests).
+- `jumpSource.filterCaseSensitive`: Used when index files are listed. When set to true the filter will exclude results with the wrong case (default: true).
+- `jumpSource.excludePattern`: Used when index files are listed. This glob pattern is ignored in the file search.
 
 Set `jumpSource.testSubFolder` to empty string if your tests reside within the same folder as your source files.
 
@@ -42,9 +45,22 @@ Set `jumpSource.testSubFolder` to empty string if your tests reside within the s
 
 The extension will jump to the index file of the current folder. If the active file is in the test sub folder it will jump to the index file in the parent folder.
 
+### List all index files in the workspace
+
+1. Open the command palette with Ctrl + Shift + P and choose the List index files command. You may also use the keyboard shortcut Ctrl + O L.
+2. Pick a file or filter by entering a partial folder name.
+
+When in case sensitive mode items with the wrong case will be removed from the suggestions. However since the VS Code API doesn't allow to fully control the filter the character highlighting might not highlight as expected.
+
+Remember to review the exclude pattern setting to speed up the search for your particular project.
+
 ## Release Notes
 
 Releases of jumpSource for VS Code.
+
+### 1.2.0
+
+Adds support for listing all index files in the workspace with filtering capabilities.
 
 ### 1.1.1
 

@@ -5,7 +5,9 @@ import {
   getCorrespondingTestFilePath,
   openNewTab,
   getCorrespondingSourceFilePath,
-  getClosestIndexFilePaths
+  getClosestIndexFilePaths,
+  getListOfIndexFiles,
+  getCurrentAbsolutePath
 } from "./helpers";
 
 // this method is called when your extension is activated
@@ -33,7 +35,12 @@ export function activate(context: vscode.ExtensionContext) {
   disposable = vscode.commands.registerCommand(
     "extension.jumpIndex",
     async () => {
-      const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
+      const activeFilePath = getCurrentAbsolutePath();
+      if (!activeFilePath) {
+        vscode.window.showErrorMessage(`Open a file first`);
+        return;
+      }
+
       const indexFilePaths = await getClosestIndexFilePaths(activeFilePath);
 
       if (indexFilePaths.length === 0) {
@@ -43,6 +50,24 @@ export function activate(context: vscode.ExtensionContext) {
       } else {
         vscode.window.showErrorMessage(`Found multiple index files`);
       }
+    }
+  );
+
+  context.subscriptions.push(disposable);
+
+  disposable = vscode.commands.registerCommand(
+    "extension.listIndex",
+    async () => {
+      const items = await getListOfIndexFiles();
+
+      const quickPick = vscode.window.createQuickPick();
+      quickPick.items = items;
+
+      quickPick.onDidChangeValue(async filterValue => {
+        quickPick.items = await getListOfIndexFiles(filterValue);
+      });
+
+      quickPick.show();
     }
   );
 

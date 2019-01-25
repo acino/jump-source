@@ -4,6 +4,13 @@ import { dirname, basename, join, sep, relative } from "path";
 const EXTENSION_NAME = "jumpSource";
 const CONF_TEST_FILE_SUFFIX = "testFileSuffix";
 const CONF_TEST_SUB_FOLDER = "testSubFolder";
+const CONF_FILTER_CASE_SENSITIVE = "filterCaseSensitive";
+const CONF_EXCLUDE_PATTERN = "excludePattern";
+
+export type RelativePath = {
+  relativeRoot: string;
+  displayName: string;
+};
 
 export const isTest = (path: string) => {
   const re = new RegExp(`\\.${getTestFileSuffix()}\\.\\w+`);
@@ -58,6 +65,76 @@ export const openNewTab = (filePath: string) => {
   );
 };
 
+export const getIndexFileDisplayName = (indexFilePath: string) =>
+  dirname(indexFilePath)
+    .split(sep)
+    .pop();
+
+export const getCurrentAbsolutePath = () =>
+  vscode.window.activeTextEditor
+    ? vscode.window.activeTextEditor.document.uri.fsPath
+    : null;
+
+export const getListOfIndexFiles = async (
+  filterValue = ""
+): Promise<vscode.QuickPickItem[]> => {
+  const indexFiles = await getAllIndexFilesInWorkspace();
+  let relativePaths = convertToRelative(indexFiles);
+  relativePaths = filterByValue(relativePaths, filterValue);
+  return relativePaths.map(({ relativeRoot, displayName }) => {
+    const quickPickItem: vscode.QuickPickItem = {
+      label: displayName,
+      detail: relativeRoot
+    };
+    return quickPickItem;
+  });
+};
+
+const getAllIndexFilesInWorkspace = async () => {
+  const currentFile = getCurrentAbsolutePath();
+  return await vscode.workspace
+    .findFiles("**/index.*", getExcludePattern())
+    .then(files =>
+      files
+        .map(file => file.fsPath)
+        .filter(absolutePath => absolutePath !== currentFile)
+        .filter(absolutePath => {
+          const filename = basename(absolutePath);
+          return /^index\.[^\.]+$/.test(filename);
+        })
+    );
+};
+
+const convertToRelative = (paths: string[]): RelativePath[] => {
+  const rootPath = vscode.workspace.rootPath;
+  return paths.map(absolutePath => {
+    const relativeRoot = relative(rootPath, absolutePath);
+    const displayName = getIndexFileDisplayName(relativeRoot);
+    return {
+      relativeRoot,
+      displayName
+    };
+  });
+};
+
+const filterByValue = (relativePaths: RelativePath[], filterValue: string) =>
+  isFilterCaseSensitive()
+    ? relativePaths.filter(relativePath => {
+        let start = 0;
+        for (let i = 0; i < filterValue.length; i++) {
+          const index = relativePath.displayName.indexOf(
+            filterValue.charAt(i),
+            start
+          );
+          if (index === -1) {
+            return false;
+          }
+          start = index + 1;
+        }
+        return true;
+      })
+    : relativePaths;
+
 const getParentDir = (dirPath: string) => {
   const subFolderName = getTestSubFolderName();
   if (!subFolderName) {
@@ -92,3 +169,12 @@ const getTestFileSuffix = (): string =>
 
 const getTestSubFolderName = (): string =>
   vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_TEST_SUB_FOLDER);
+
+const isFilterCaseSensitive = (): boolean =>
+  vscode.workspace
+    .getConfiguration(EXTENSION_NAME)
+    .get(CONF_FILTER_CASE_SENSITIVE);
+
+const getExcludePattern = (): string =>
+  vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_EXCLUDE_PATTERN) ||
+  null;
