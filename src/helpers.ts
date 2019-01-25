@@ -90,6 +90,9 @@ export const getListOfIndexFiles = async (
   });
 };
 
+export const relativeRootToAbsolute = (relativePath: string) =>
+  join(vscode.workspace.rootPath, relativePath);
+
 const getAllIndexFilesInWorkspace = async () => {
   const currentFile = getCurrentAbsolutePath();
   return await vscode.workspace

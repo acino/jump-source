@@ -58,6 +58,10 @@ Remember to review the exclude pattern setting to speed up the search for your p
 
 Releases of jumpSource for VS Code.
 
+### 1.2.1
+
+Fixes issue with opening index file from quick pick.
+
 ### 1.2.0
 
 Adds support for listing all index files in the workspace with filtering capabilities.

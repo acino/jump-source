@@ -6,6 +6,10 @@ Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how 
 
 ## [Unreleased]
 
+### 1.2.1
+
+Fixes issue with opening index file from quick pick.
+
 ### 1.2.0
 
 Adds support for listing all index files in the workspace with filtering capabilities.

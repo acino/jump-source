@@ -1,5 +1,6 @@
 "use strict";
 import * as vscode from "vscode";
+
 import {
   isTest,
   getCorrespondingTestFilePath,
@@ -7,7 +8,8 @@ import {
   getCorrespondingSourceFilePath,
   getClosestIndexFilePaths,
   getListOfIndexFiles,
-  getCurrentAbsolutePath
+  getCurrentAbsolutePath,
+  relativeRootToAbsolute
 } from "./helpers";
 
 // this method is called when your extension is activated
@@ -65,6 +67,12 @@ export function activate(context: vscode.ExtensionContext) {
 
       quickPick.onDidChangeValue(async filterValue => {
         quickPick.items = await getListOfIndexFiles(filterValue);
+      });
+
+      quickPick.onDidAccept(async () => {
+        quickPick.selectedItems.forEach(selectedItem => {
+          openNewTab(relativeRootToAbsolute(selectedItem.detail));
+        });
       });
 
       quickPick.show();
