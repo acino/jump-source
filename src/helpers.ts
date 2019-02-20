@@ -65,6 +65,21 @@ export const openNewTab = (filePath: string) => {
   );
 };
 
+export const createOrOpenInNewTab = (filePath: string) => {
+  const e = new vscode.WorkspaceEdit();
+  const uri = vscode.Uri.file(filePath);
+  e.createFile(uri, { overwrite: false, ignoreIfExists: true });
+
+  vscode.workspace.applyEdit(e).then(
+    () => {
+      openNewTab(filePath);
+    },
+    () => {
+      vscode.window.showErrorMessage(`Failed to create test counterpart`);
+    }
+  );
+};
+
 export const getIndexFileDisplayName = (indexFilePath: string) =>
   dirname(indexFilePath)
     .split(sep)

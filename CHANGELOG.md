@@ -1,10 +1,14 @@
-# Change Log
+# Change log
 
 All notable changes to the "jump-source" extension will be documented in this file.
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
 ## [Unreleased]
+
+### 1.3.0
+
+Adds support for creating a test file for the currently active source file.
 
 ### 1.2.1
 

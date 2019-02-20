@@ -9,7 +9,8 @@ import {
   getClosestIndexFilePaths,
   getListOfIndexFiles,
   getCurrentAbsolutePath,
-  relativeRootToAbsolute
+  relativeRootToAbsolute,
+  createOrOpenInNewTab
 } from "./helpers";
 
 // this method is called when your extension is activated
@@ -76,6 +77,20 @@ export function activate(context: vscode.ExtensionContext) {
       });
 
       quickPick.show();
+    }
+  );
+
+  context.subscriptions.push(disposable);
+
+  disposable = vscode.commands.registerCommand(
+    "extension.createTest",
+    async () => {
+      const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
+
+      if (!isTest(activeFilePath)) {
+        const testFilePath = getCorrespondingTestFilePath(activeFilePath);
+        createOrOpenInNewTab(testFilePath);
+      }
     }
   );
 
