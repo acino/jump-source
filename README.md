@@ -8,6 +8,7 @@ It enables you to:
 - Go to the closest index source file.
 - List all index files in the workspace.
 - Create a test file for the current source file.
+- Cycle through files in the same folder with the same filename.
 
 ## Features
 
@@ -60,9 +61,19 @@ Remember to review the exclude pattern setting to speed up the search for your p
 1. Open a source file.
 2. Open the command palette with Ctrl + Shift + P and choose the Create a test for this command. You may also use the keyboard shortcut Ctrl + O C.
 
+### Cycle through files with the same name
+
+When you have multiple files in the same folder with the same filename but different file extensions, you can cycle through them by opening the command palette with Ctrl + Shift + P and choose the Cycle through files with the same name command. You can also use the keyboard shortcut Shift + Alt + -.
+
+This command is always case insensitive.
+
 ## Release Notes
 
 Releases of jumpSource for VS Code.
+
+### 1.3.1
+
+Adds support for cycling through files with the same filename in the current folder.
 
 ### 1.3.0
 

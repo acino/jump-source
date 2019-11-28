@@ -10,7 +10,8 @@ import {
   getListOfIndexFiles,
   getCurrentAbsolutePath,
   relativeRootToAbsolute,
-  createOrOpenInNewTab
+  createOrOpenInNewTab,
+  getNextFileWithTheSameFilename
 } from "./helpers";
 
 // this method is called when your extension is activated
@@ -19,25 +20,24 @@ export function activate(context: vscode.ExtensionContext) {
   // The command has been defined in the package.json file
   // Now provide the implementation of the command with  registerCommand
   // The commandId parameter must match the command field in package.json
-  let disposable = vscode.commands.registerCommand("extension.jumpTest", () => {
-    // The code you place here will be executed every time your command is executed
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.jumpTest", () => {
+      // The code you place here will be executed every time your command is executed
 
-    const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
+      const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
 
-    if (isTest(activeFilePath)) {
-      const sourceFilePath = getCorrespondingSourceFilePath(activeFilePath);
-      openNewTab(sourceFilePath);
-    } else {
-      const testFilePath = getCorrespondingTestFilePath(activeFilePath);
-      openNewTab(testFilePath);
-    }
-  });
+      if (isTest(activeFilePath)) {
+        const sourceFilePath = getCorrespondingSourceFilePath(activeFilePath);
+        openNewTab(sourceFilePath);
+      } else {
+        const testFilePath = getCorrespondingTestFilePath(activeFilePath);
+        openNewTab(testFilePath);
+      }
+    })
+  );
 
-  context.subscriptions.push(disposable);
-
-  disposable = vscode.commands.registerCommand(
-    "extension.jumpIndex",
-    async () => {
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.jumpIndex", async () => {
       const activeFilePath = getCurrentAbsolutePath();
       if (!activeFilePath) {
         vscode.window.showErrorMessage(`Open a file first`);
@@ -53,14 +53,11 @@ export function activate(context: vscode.ExtensionContext) {
       } else {
         vscode.window.showErrorMessage(`Found multiple index files`);
       }
-    }
+    })
   );
 
-  context.subscriptions.push(disposable);
-
-  disposable = vscode.commands.registerCommand(
-    "extension.listIndex",
-    async () => {
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.listIndex", async () => {
       const items = await getListOfIndexFiles();
 
       const quickPick = vscode.window.createQuickPick();
@@ -77,24 +74,30 @@ export function activate(context: vscode.ExtensionContext) {
       });
 
       quickPick.show();
-    }
+    })
   );
 
-  context.subscriptions.push(disposable);
-
-  disposable = vscode.commands.registerCommand(
-    "extension.createTest",
-    async () => {
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.createTest", async () => {
       const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
 
       if (!isTest(activeFilePath)) {
         const testFilePath = getCorrespondingTestFilePath(activeFilePath);
         createOrOpenInNewTab(testFilePath);
       }
-    }
+    })
   );
 
-  context.subscriptions.push(disposable);
+  context.subscriptions.push(
+    vscode.commands.registerCommand("extension.cycleFilename", async () => {
+      const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
+
+      const nextPath = await getNextFileWithTheSameFilename(activeFilePath);
+      if (nextPath) {
+        createOrOpenInNewTab(nextPath);
+      }
+    })
+  );
 }
 
 // this method is called when your extension is deactivated

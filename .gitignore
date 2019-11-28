@@ -1,4 +1,11 @@
-out
 node_modules
-.vscode-test/
-*.vsix
+.vscode/**
+.vscode-test/**
+out/**
+src/**
+.gitignore
+vsc-extension-quickstart.md
+**/tsconfig.json
+**/tslint.json
+**/*.map
+**/*.ts

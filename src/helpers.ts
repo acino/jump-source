@@ -108,6 +108,35 @@ export const getListOfIndexFiles = async (
 export const relativeRootToAbsolute = (relativePath: string) =>
   join(vscode.workspace.rootPath, relativePath);
 
+export const getNextFileWithTheSameFilename = async (relativePath: string) => {
+  const currentFile = getCurrentAbsolutePath();
+  const currentDirectory = dirname(relativePath);
+  const currentFilename = getFilenameWithoutExtension(relativePath);
+
+  const nextPath = await vscode.workspace
+    .findFiles(new vscode.RelativePattern(currentDirectory, "*.*")) // Glob is case sensitive
+    .then(files => {
+      const paths = files
+        .map(file => file.fsPath)
+        .filter(
+          path =>
+            currentFilename.toLowerCase() ===
+            getFilenameWithoutExtension(path).toLowerCase()
+        );
+
+      const indexOfCurrentFile = paths.findIndex(path => path === currentFile);
+      if (indexOfCurrentFile === -1) {
+        return null;
+      }
+      if (indexOfCurrentFile + 1 >= paths.length) {
+        return paths[0];
+      }
+      return paths[indexOfCurrentFile + 1];
+    });
+
+  return nextPath;
+};
+
 const getAllIndexFilesInWorkspace = async () => {
   const currentFile = getCurrentAbsolutePath();
   return await vscode.workspace
@@ -196,3 +225,10 @@ const isFilterCaseSensitive = (): boolean =>
 const getExcludePattern = (): string =>
   vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_EXCLUDE_PATTERN) ||
   null;
+
+const getFilenameWithoutExtension = (path: string) => {
+  const filename = basename(path);
+  const parts = filename.split(".");
+  parts.pop();
+  return parts.join(".");
+};

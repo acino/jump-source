@@ -4,25 +4,27 @@ All notable changes to the "jump-source" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
-## [Unreleased]
+## 1.3.1
 
-### 1.3.0
+Adds support for cycling through files with the same filename in the current folder.
+
+## 1.3.0
 
 Adds support for creating a test file for the currently active source file.
 
-### 1.2.1
+## 1.2.1
 
 Fixes issue with opening index file from quick pick.
 
-### 1.2.0
+## 1.2.0
 
 Adds support for listing all index files in the workspace with filtering capabilities.
 
-### 1.1.1
+## 1.1.1
 
 Performance fix for jump to index file.
 
-### 1.1.0
+## 1.1.0
 
 Adds support for jumping to the closest index file.
 
