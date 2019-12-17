@@ -1,7 +1,7 @@
 {
   "name": "jump-source",
   "displayName": "jump-source for VS Code",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "publisher": "Acino",
   "description": "Shortcuts to jump between source files and test files",
   "author": {
@@ -104,6 +104,11 @@
           "type": "string",
           "default": "**/node_modules/**",
           "description": "Used when index files are listed. This glob pattern is ignored in the file search."
+        },
+        "jumpSource.matchExtension": {
+          "type": "boolean",
+          "default": true,
+          "description": "Match file extension of source file and test file exactly."
         }
       }
     }

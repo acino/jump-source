@@ -1,5 +1,5 @@
-"use strict";
-import * as vscode from "vscode";
+'use strict';
+import * as vscode from 'vscode';
 
 import {
   isTest,
@@ -7,12 +7,12 @@ import {
   openNewTab,
   getCorrespondingSourceFilePath,
   getClosestIndexFilePaths,
-  getListOfIndexFiles,
   getCurrentAbsolutePath,
-  relativeRootToAbsolute,
   createOrOpenInNewTab,
-  getNextFileWithTheSameFilename
-} from "./helpers";
+  getNextFileWithTheSameFilename,
+  showPicker,
+  getAllIndexFilesInWorkspace
+} from './helpers';
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -21,7 +21,7 @@ export function activate(context: vscode.ExtensionContext) {
   // Now provide the implementation of the command with  registerCommand
   // The commandId parameter must match the command field in package.json
   context.subscriptions.push(
-    vscode.commands.registerCommand("extension.jumpTest", () => {
+    vscode.commands.registerCommand('extension.jumpTest', () => {
       // The code you place here will be executed every time your command is executed
 
       const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
@@ -37,7 +37,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("extension.jumpIndex", async () => {
+    vscode.commands.registerCommand('extension.jumpIndex', async () => {
       const activeFilePath = getCurrentAbsolutePath();
       if (!activeFilePath) {
         vscode.window.showErrorMessage(`Open a file first`);
@@ -57,28 +57,14 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("extension.listIndex", async () => {
-      const items = await getListOfIndexFiles();
-
-      const quickPick = vscode.window.createQuickPick();
-      quickPick.items = items;
-
-      quickPick.onDidChangeValue(async filterValue => {
-        quickPick.items = await getListOfIndexFiles(filterValue);
-      });
-
-      quickPick.onDidAccept(async () => {
-        quickPick.selectedItems.forEach(selectedItem => {
-          openNewTab(relativeRootToAbsolute(selectedItem.detail));
-        });
-      });
-
-      quickPick.show();
+    vscode.commands.registerCommand('extension.listIndex', async () => {
+      const paths = await getAllIndexFilesInWorkspace();
+      showPicker(paths);
     })
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("extension.createTest", async () => {
+    vscode.commands.registerCommand('extension.createTest', async () => {
       const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
 
       if (!isTest(activeFilePath)) {
@@ -89,7 +75,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("extension.cycleFilename", async () => {
+    vscode.commands.registerCommand('extension.cycleFilename', async () => {
       const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
 
       const nextPath = await getNextFileWithTheSameFilename(activeFilePath);

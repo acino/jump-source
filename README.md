@@ -28,6 +28,7 @@ This extension contributes the following settings:
 
 - `jumpSource.testFileSuffix`: Suffix to append to source file name before the file extension (default: test).
 - `jumpSource.testSubFolder`: Name of sub folder containing tests (default: tests).
+- `jumpSource.matchExtension`: When set to `true` the extension of the source file and test file have to match. When set to `false` a context menu will be shown if necessary (default: `true`).
 - `jumpSource.filterCaseSensitive`: Used when index files are listed. When set to true the filter will exclude results with the wrong case (default: true).
 - `jumpSource.excludePattern`: Used when index files are listed. This glob pattern is ignored in the file search.
 
@@ -70,6 +71,10 @@ This command is always case insensitive.
 ## Release Notes
 
 Releases of jumpSource for VS Code.
+
+### 1.3.2
+
+Adds setting for loose matching of source file and test file. It's now possible to ignore differences in file extension.
 
 ### 1.3.1
 

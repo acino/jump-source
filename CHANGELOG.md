@@ -4,6 +4,10 @@ All notable changes to the "jump-source" extension will be documented in this fi
 
 Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
 
+## 1.3.2
+
+Adds setting for loose matching of source file and test file. It's now possible to ignore differences in file extension.
+
 ## 1.3.1
 
 Adds support for cycling through files with the same filename in the current folder.
