@@ -7,6 +7,8 @@ const CONF_TEST_SUB_FOLDER = 'testSubFolder';
 const CONF_MATCH_EXTENSION = 'matchExtension';
 const CONF_FILTER_CASE_SENSITIVE = 'filterCaseSensitive';
 const CONF_EXCLUDE_PATTERN = 'excludePattern';
+const CONF_TEST_FILE_EXTENSION = 'testFileExtension';
+const SAME_AS_SOURCE = 'sameAsSource';
 
 export type RelativePath = {
   relativeRoot: string;
@@ -14,7 +16,7 @@ export type RelativePath = {
 };
 
 export const isTest = (path: string) => {
-  const re = new RegExp(`\\.${getTestFileSuffix()}\\.\\w+`);
+  const re = new RegExp(`\\.${getTestFileSuffix()}\\.(\\w+|\\*)`);
   return re.test(path);
 };
 
@@ -25,9 +27,9 @@ export const getCorrespondingSourceFilePath = (testFilePath: string) => {
   return join(sourceDir, sourceFilename);
 };
 
-export const getCorrespondingTestFilePath = (sourceFilePath: string) => {
+export const getCorrespondingTestFilePath = (sourceFilePath: string, exact = false) => {
   const testDir = join(dirname(sourceFilePath), getTestSubFolderName());
-  const testFilename = addTestSuffix(basename(sourceFilePath));
+  const testFilename = addTestSuffix(basename(sourceFilePath), exact);
 
   return join(testDir, testFilename);
 };
@@ -123,7 +125,10 @@ export const showPicker = async (absolutePaths: string[]) => {
   quickPick.show();
 };
 
-const relativeRootToAbsolute = (relativePath: string) => join(vscode.workspace.rootPath, relativePath);
+const relativeRootToAbsolute = (relativePath: string) => {
+  const x = vscode.workspace.workspaceFolders;
+  return join(vscode.workspace.rootPath, relativePath);
+};
 
 const getIndexFileDisplayName = (indexFilePath: string) =>
   dirname(indexFilePath)
@@ -204,13 +209,20 @@ const removeTestSuffix = (sourceFilename: string) => {
   return sourceFilenameParts.join('.');
 };
 
-const addTestSuffix = (testFilename: string) => {
+const addTestSuffix = (testFilename: string, exact: boolean) => {
   const testFilenameParts = testFilename.split('.');
   const extension = testFilenameParts.pop();
   testFilenameParts.push(getTestFileSuffix());
 
   if (hasToMatchExtension()) {
     testFilenameParts.push(extension);
+  } else if (exact) {
+    const extensionSetting = getTestFileExtension();
+    if (extensionSetting === SAME_AS_SOURCE) {
+      testFilenameParts.push(extension);
+    } else {
+      testFilenameParts.push(extensionSetting);
+    }
   } else {
     testFilenameParts.push('*');
   }
@@ -231,7 +243,7 @@ const pickFromListOfFiles = async (filePath: string, errorCallback: () => void) 
 
   const paths = await findFilesCaseInsensitive(folder, filenameWithoutExtension);
 
-  if (!paths) {
+  if (paths.length === 0) {
     errorCallback();
     return;
   }
@@ -266,3 +278,6 @@ const isFilterCaseSensitive = (): boolean =>
 
 const getExcludePattern = (): string =>
   vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_EXCLUDE_PATTERN) || null;
+
+const getTestFileExtension = (): string =>
+  vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_TEST_FILE_EXTENSION);

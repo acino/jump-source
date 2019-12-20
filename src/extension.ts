@@ -68,7 +68,7 @@ export function activate(context: vscode.ExtensionContext) {
       const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
 
       if (!isTest(activeFilePath)) {
-        const testFilePath = getCorrespondingTestFilePath(activeFilePath);
+        const testFilePath = getCorrespondingTestFilePath(activeFilePath, true);
         createOrOpenInNewTab(testFilePath);
       }
     })

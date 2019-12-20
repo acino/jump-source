@@ -62,6 +62,8 @@ Remember to review the exclude pattern setting to speed up the search for your p
 1. Open a source file.
 2. Open the command palette with Ctrl + Shift + P and choose the Create a test for this command. You may also use the keyboard shortcut Ctrl + O C.
 
+If you want the test file to have a different file extension you can change the `jumpSource.testFileExtension` setting.
+
 ### Cycle through files with the same name
 
 When you have multiple files in the same folder with the same filename but different file extensions, you can cycle through them by opening the command palette with Ctrl + Shift + P and choose the Cycle through files with the same name command. You can also use the keyboard shortcut Shift + Alt + -.
@@ -71,6 +73,10 @@ This command is always case insensitive.
 ## Release Notes
 
 Releases of jumpSource for VS Code.
+
+### 1.3.3
+
+Adds setting for test file extension for cases where the source file and test file have different file extensions.
 
 ### 1.3.2
 
