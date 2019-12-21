@@ -11,7 +11,8 @@ import {
   createOrOpenInNewTab,
   getNextFileWithTheSameFilename,
   showPicker,
-  getAllIndexFilesInWorkspace
+  getAllIndexFilesInWorkspace,
+  PickerDisplay
 } from './helpers';
 
 // this method is called when your extension is activated
@@ -22,34 +23,28 @@ export function activate(context: vscode.ExtensionContext) {
   // The commandId parameter must match the command field in package.json
   context.subscriptions.push(
     vscode.commands.registerCommand('extension.jumpTest', () => {
-      // The code you place here will be executed every time your command is executed
+      const activeFileUri = vscode.window.activeTextEditor.document.uri;
 
-      const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
-
-      if (isTest(activeFilePath)) {
-        const sourceFilePath = getCorrespondingSourceFilePath(activeFilePath);
-        openNewTab(sourceFilePath);
+      if (isTest(activeFileUri)) {
+        const sourceFileUri = getCorrespondingSourceFilePath(activeFileUri);
+        openNewTab(sourceFileUri);
       } else {
-        const testFilePath = getCorrespondingTestFilePath(activeFilePath);
-        openNewTab(testFilePath);
+        const testFileUri = getCorrespondingTestFilePath(activeFileUri);
+        openNewTab(testFileUri);
       }
     })
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand('extension.jumpIndex', async () => {
-      const activeFilePath = getCurrentAbsolutePath();
-      if (!activeFilePath) {
-        vscode.window.showErrorMessage(`Open a file first`);
-        return;
-      }
+      const activeFileUri = vscode.window.activeTextEditor.document.uri;
 
-      const indexFilePaths = await getClosestIndexFilePaths(activeFilePath);
+      const indexFileUris = await getClosestIndexFilePaths(activeFileUri);
 
-      if (indexFilePaths.length === 0) {
+      if (indexFileUris.length === 0) {
         vscode.window.showErrorMessage(`Couldn't find an index file`);
-      } else if (indexFilePaths.length === 1) {
-        openNewTab(indexFilePaths[0]);
+      } else if (indexFileUris.length === 1) {
+        openNewTab(indexFileUris[0]);
       } else {
         vscode.window.showErrorMessage(`Found multiple index files`);
       }
@@ -58,29 +53,27 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('extension.listIndex', async () => {
-      const paths = await getAllIndexFilesInWorkspace();
-      showPicker(paths);
+      const fileUris = await getAllIndexFilesInWorkspace();
+      showPicker(PickerDisplay.IndexFiles, fileUris);
     })
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand('extension.createTest', async () => {
-      const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
+      const activeFileUri = vscode.window.activeTextEditor.document.uri;
 
-      if (!isTest(activeFilePath)) {
-        const testFilePath = getCorrespondingTestFilePath(activeFilePath, true);
-        createOrOpenInNewTab(testFilePath);
+      if (!isTest(activeFileUri)) {
+        const testFileUri = getCorrespondingTestFilePath(activeFileUri, true);
+        createOrOpenInNewTab(testFileUri);
       }
     })
   );
 
   context.subscriptions.push(
     vscode.commands.registerCommand('extension.cycleFilename', async () => {
-      const activeFilePath = vscode.window.activeTextEditor.document.uri.fsPath;
-
-      const nextPath = await getNextFileWithTheSameFilename(activeFilePath);
-      if (nextPath) {
-        createOrOpenInNewTab(nextPath);
+      const nextFileUri = await getNextFileWithTheSameFilename();
+      if (nextFileUri) {
+        createOrOpenInNewTab(nextFileUri);
       }
     })
   );

@@ -15,71 +15,75 @@ export type RelativePath = {
   displayName: string;
 };
 
-export const isTest = (path: string) => {
+export enum PickerDisplay {
+  Basename,
+  IndexFiles
+}
+
+export const isTest = (uri: vscode.Uri) => {
   const re = new RegExp(`\\.${getTestFileSuffix()}\\.(\\w+|\\*)`);
-  return re.test(path);
+  return re.test(uri.fsPath);
 };
 
-export const getCorrespondingSourceFilePath = (testFilePath: string) => {
-  const sourceDir = getParentDir(dirname(testFilePath));
-  const sourceFilename = removeTestSuffix(basename(testFilePath));
+export const getCorrespondingSourceFilePath = (testFileUri: vscode.Uri) => {
+  const absoluteSourceDir = getParentDir(dirname(testFileUri.fsPath));
+  const sourceFilename = removeTestSuffix(basename(testFileUri.fsPath));
 
-  return join(sourceDir, sourceFilename);
+  const absolutePath = join(absoluteSourceDir, sourceFilename);
+  return vscode.Uri.file(absolutePath);
 };
 
-export const getCorrespondingTestFilePath = (sourceFilePath: string, exact = false) => {
-  const testDir = join(dirname(sourceFilePath), getTestSubFolderName());
-  const testFilename = addTestSuffix(basename(sourceFilePath), exact);
+export const getCorrespondingTestFilePath = (sourceFileUri: vscode.Uri, exact = false) => {
+  const absoluteTestDir = join(dirname(sourceFileUri.fsPath), getTestSubFolderName());
+  const testFilename = addTestSuffix(basename(sourceFileUri.fsPath), exact);
 
-  return join(testDir, testFilename);
+  const absolutePath = join(absoluteTestDir, testFilename);
+  return vscode.Uri.file(absolutePath);
 };
 
-export const getClosestIndexFilePaths = async (currentFilePath: string) => {
-  let dirPath = dirname(currentFilePath);
-  const nameOfDir = basename(dirPath);
-  if (nameOfDir === getTestSubFolderName()) {
-    dirPath = getParentDir(dirPath);
+export const getClosestIndexFilePaths = async (currentFileUri: vscode.Uri) => {
+  let absoluteFolderPath = dirname(currentFileUri.fsPath);
+  const folderName = basename(absoluteFolderPath);
+  if (folderName === getTestSubFolderName()) {
+    absoluteFolderPath = getParentDir(absoluteFolderPath);
   }
 
-  const pattern = new vscode.RelativePattern(dirPath, 'index.*');
+  const pattern = new vscode.RelativePattern(absoluteFolderPath, 'index.*');
 
   const absolutePaths = await vscode.workspace.findFiles(pattern).then((files) =>
-    files
-      .map((file) => file.fsPath)
-      .filter((absolutePath) => {
-        const filename = basename(absolutePath);
-        return /^index\.[^\.]+$/.test(filename);
-      })
+    files.filter((fileUri) => {
+      const filename = basename(fileUri.fsPath);
+      return /^index\.[^\.]+$/.test(filename);
+    })
   );
 
   return absolutePaths;
 };
 
-export const openNewTab = (filePath: string) => {
+export const openNewTab = (fileUri: vscode.Uri) => {
   const errorCallback = () => {
-    if (isTest(filePath)) {
+    if (isTest(fileUri)) {
       vscode.window.showErrorMessage(`Couldn't find test file counterpart`);
     } else {
       vscode.window.showErrorMessage(`Couldn't find source file counterpart`);
     }
   };
 
-  if (filePath.endsWith('.*')) {
-    pickFromListOfFiles(filePath, errorCallback);
+  if (fileUri.fsPath.endsWith('.*')) {
+    pickFromListOfFiles(fileUri, errorCallback);
     return;
   }
 
-  vscode.workspace.openTextDocument(filePath).then((doc) => vscode.window.showTextDocument(doc), errorCallback);
+  vscode.workspace.openTextDocument(fileUri).then((doc) => vscode.window.showTextDocument(doc), errorCallback);
 };
 
-export const createOrOpenInNewTab = (filePath: string) => {
+export const createOrOpenInNewTab = (fileUri: vscode.Uri) => {
   const e = new vscode.WorkspaceEdit();
-  const uri = vscode.Uri.file(filePath);
-  e.createFile(uri, { overwrite: false, ignoreIfExists: true });
+  e.createFile(fileUri, { overwrite: false, ignoreIfExists: true });
 
   vscode.workspace.applyEdit(e).then(
     () => {
-      openNewTab(filePath);
+      openNewTab(fileUri);
     },
     () => {
       vscode.window.showErrorMessage(`Failed to create test counterpart`);
@@ -90,48 +94,48 @@ export const createOrOpenInNewTab = (filePath: string) => {
 export const getCurrentAbsolutePath = () =>
   vscode.window.activeTextEditor ? vscode.window.activeTextEditor.document.uri.fsPath : null;
 
-export const getNextFileWithTheSameFilename = async (relativePath: string) => {
-  const currentFile = getCurrentAbsolutePath();
-  const currentDirectory = dirname(relativePath);
-  const currentFilename = getFilenameWithoutExtension(relativePath);
+export const getNextFileWithTheSameFilename = async () => {
+  const currentFileUri = vscode.window.activeTextEditor.document.uri;
+  const currentDirectory = dirname(currentFileUri.fsPath);
+  const currentFilename = getFilenameWithoutExtension(currentFileUri.fsPath);
 
-  const paths = await findFilesCaseInsensitive(currentDirectory, currentFilename);
+  const fileUris = await findFilesCaseInsensitive(currentDirectory, currentFilename);
 
-  const indexOfCurrentFile = paths.findIndex((path) => path === currentFile);
+  const indexOfCurrentFile = fileUris.findIndex((fileUri) => fileUri.fsPath === currentFileUri.fsPath);
   if (indexOfCurrentFile === -1) {
     return null;
   }
-  if (indexOfCurrentFile + 1 >= paths.length) {
-    return paths[0];
+  if (indexOfCurrentFile + 1 >= fileUris.length) {
+    return fileUris[0];
   }
 
-  return paths[indexOfCurrentFile + 1];
+  return fileUris[indexOfCurrentFile + 1];
 };
 
-export const showPicker = async (absolutePaths: string[]) => {
+export const showPicker = async (display: PickerDisplay, fileUris: vscode.Uri[]) => {
   const quickPick = vscode.window.createQuickPick();
-  quickPick.items = getPickerItemsFromFiles(absolutePaths);
+  let { uris, pickerItems } = getPickerItemsFromFiles(display, fileUris);
+  quickPick.items = pickerItems;
 
   quickPick.onDidChangeValue(async (filterValue) => {
-    quickPick.items = getPickerItemsFromFiles(absolutePaths, filterValue);
+    ({ uris, pickerItems } = getPickerItemsFromFiles(display, fileUris, filterValue));
+    quickPick.items = pickerItems;
   });
 
   quickPick.onDidAccept(async () => {
     quickPick.selectedItems.forEach((selectedItem) => {
-      openNewTab(relativeRootToAbsolute(selectedItem.detail));
+      const index = pickerItems.findIndex((item) => item === selectedItem);
+      if (index !== -1 && uris[index]) {
+        openNewTab(uris[index]);
+      }
     });
   });
 
   quickPick.show();
 };
 
-const relativeRootToAbsolute = (relativePath: string) => {
-  const x = vscode.workspace.workspaceFolders;
-  return join(vscode.workspace.rootPath, relativePath);
-};
-
-const getIndexFileDisplayName = (indexFilePath: string) =>
-  dirname(indexFilePath)
+const getIndexFileDisplayName = (fileUri: vscode.Uri) =>
+  dirname(fileUri.fsPath)
     .split(sep)
     .pop();
 
@@ -139,42 +143,36 @@ const findFilesCaseInsensitive = async (folder: string, filenameWithoutExtension
   await vscode.workspace
     .findFiles(new vscode.RelativePattern(folder, '*.*')) // Glob is case sensitive
     .then((files) =>
-      files
-        .map((file) => file.fsPath)
-        .filter((path) => filenameWithoutExtension.toLowerCase() === getFilenameWithoutExtension(path).toLowerCase())
+      files.filter(
+        (fileUri) =>
+          filenameWithoutExtension.toLowerCase() === getFilenameWithoutExtension(fileUri.fsPath).toLowerCase()
+      )
     );
 
 export const getAllIndexFilesInWorkspace = async () => {
-  const currentFile = getCurrentAbsolutePath();
+  const currentAbsolutePath = getCurrentAbsolutePath();
   return await vscode.workspace.findFiles('**/index.*', getExcludePattern()).then((files) =>
     files
-      .map((file) => file.fsPath)
-      .filter((absolutePath) => absolutePath !== currentFile)
-      .filter((absolutePath) => {
-        const filename = basename(absolutePath);
+      .filter((fileUri) => fileUri.fsPath !== currentAbsolutePath)
+      .filter((fileUri) => {
+        const filename = basename(fileUri.fsPath);
         return /^index\.[^\.]+$/.test(filename);
       })
   );
 };
 
-const convertToRelative = (paths: string[]): RelativePath[] => {
-  const rootPath = vscode.workspace.rootPath;
-  return paths.map((absolutePath) => {
-    const relativeRoot = relative(rootPath, absolutePath);
-    const displayName = getIndexFileDisplayName(relativeRoot);
-    return {
-      relativeRoot,
-      displayName
-    };
-  });
+const convertToRelative = (fileUri: vscode.Uri) => {
+  const workspaceFolder = vscode.workspace.getWorkspaceFolder(fileUri);
+  return relative(workspaceFolder.uri.fsPath, fileUri.fsPath);
 };
 
-const filterByValue = (relativePaths: RelativePath[], filterValue: string) =>
+const filterByValue = (fileUris: vscode.Uri[], filterValue: string) =>
   isFilterCaseSensitive()
-    ? relativePaths.filter((relativePath) => {
+    ? fileUris.filter((fileUri) => {
+        const displayName = getIndexFileDisplayName(fileUri);
         let start = 0;
         for (let i = 0; i < filterValue.length; i++) {
-          const index = relativePath.displayName.indexOf(filterValue.charAt(i), start);
+          const index = displayName.indexOf(filterValue.charAt(i), start);
           if (index === -1) {
             return false;
           }
@@ -182,7 +180,7 @@ const filterByValue = (relativePaths: RelativePath[], filterValue: string) =>
         }
         return true;
       })
-    : relativePaths;
+    : fileUris;
 
 const getParentDir = (dirPath: string) => {
   const subFolderName = getTestSubFolderName();
@@ -237,34 +235,39 @@ const getFilenameWithoutExtension = (path: string) => {
   return parts.join('.');
 };
 
-const pickFromListOfFiles = async (filePath: string, errorCallback: () => void) => {
-  const folder = dirname(filePath);
-  const filenameWithoutExtension = getFilenameWithoutExtension(filePath);
+const pickFromListOfFiles = async (fileUri: vscode.Uri, errorCallback: () => void) => {
+  const folder = dirname(fileUri.fsPath);
+  const filenameWithoutExtension = getFilenameWithoutExtension(fileUri.fsPath);
 
-  const paths = await findFilesCaseInsensitive(folder, filenameWithoutExtension);
+  const fileUris = await findFilesCaseInsensitive(folder, filenameWithoutExtension);
 
-  if (paths.length === 0) {
+  if (fileUris.length === 0) {
     errorCallback();
     return;
   }
-  if (paths.length === 1) {
-    openNewTab(paths[0]);
+  if (fileUris.length === 1) {
+    openNewTab(fileUris[0]);
     return;
   }
 
-  showPicker(paths);
+  showPicker(PickerDisplay.Basename, fileUris);
 };
 
-const getPickerItemsFromFiles = (absolutePaths: string[], filterValue = '') => {
-  let relativePaths = convertToRelative(absolutePaths);
-  relativePaths = filterByValue(relativePaths, filterValue);
-  return relativePaths.map(({ relativeRoot, displayName }) => {
+const getPickerItemsFromFiles = (display: PickerDisplay, fileUris: vscode.Uri[], filterValue = '') => {
+  const filteredUris = filterByValue(fileUris, filterValue);
+
+  const pickerItems = filteredUris.map((fileUri) => {
     const quickPickItem: vscode.QuickPickItem = {
-      label: displayName,
-      detail: relativeRoot
+      label: display === PickerDisplay.Basename ? basename(fileUri.fsPath) : getIndexFileDisplayName(fileUri),
+      detail: convertToRelative(fileUri)
     };
     return quickPickItem;
   });
+
+  return {
+    uris: filteredUris,
+    pickerItems
+  };
 };
 
 const getTestFileSuffix = (): string => vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_TEST_FILE_SUFFIX);
