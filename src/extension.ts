@@ -7,7 +7,6 @@ import {
   openNewTab,
   getCorrespondingSourceFilePath,
   getClosestIndexFilePaths,
-  getCurrentAbsolutePath,
   createOrOpenInNewTab,
   getNextFileWithTheSameFilename,
   showPicker,
@@ -15,12 +14,7 @@ import {
   PickerDisplay
 } from './helpers';
 
-// this method is called when your extension is activated
-// your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
-  // The command has been defined in the package.json file
-  // Now provide the implementation of the command with  registerCommand
-  // The commandId parameter must match the command field in package.json
   context.subscriptions.push(
     vscode.commands.registerCommand('extension.jumpTest', () => {
       const activeFileUri = vscode.window.activeTextEditor.document.uri;
@@ -37,9 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
 
   context.subscriptions.push(
     vscode.commands.registerCommand('extension.jumpIndex', async () => {
-      const activeFileUri = vscode.window.activeTextEditor.document.uri;
-
-      const indexFileUris = await getClosestIndexFilePaths(activeFileUri);
+      const indexFileUris = await getClosestIndexFilePaths();
 
       if (indexFileUris.length === 0) {
         vscode.window.showErrorMessage(`Couldn't find an index file`);
@@ -79,5 +71,4 @@ export function activate(context: vscode.ExtensionContext) {
   );
 }
 
-// this method is called when your extension is deactivated
 export function deactivate() {}

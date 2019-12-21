@@ -41,7 +41,8 @@ export const getCorrespondingTestFilePath = (sourceFileUri: vscode.Uri, exact = 
   return vscode.Uri.file(absolutePath);
 };
 
-export const getClosestIndexFilePaths = async (currentFileUri: vscode.Uri) => {
+export const getClosestIndexFilePaths = async () => {
+  const currentFileUri = vscode.window.activeTextEditor.document.uri;
   let absoluteFolderPath = dirname(currentFileUri.fsPath);
   const folderName = basename(absoluteFolderPath);
   if (folderName === getTestSubFolderName()) {
