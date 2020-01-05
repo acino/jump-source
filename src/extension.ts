@@ -21,11 +21,11 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (isTest(activeFileUri)) {
         const sourceFileUri = getCorrespondingSourceFilePath(activeFileUri);
-        openNewTab(sourceFileUri);
-      } else {
-        const testFileUri = getCorrespondingTestFilePath(activeFileUri);
-        openNewTab(testFileUri);
+        return openNewTab(sourceFileUri);
       }
+
+      const testFileUri = getCorrespondingTestFilePath(activeFileUri);
+      return openNewTab(testFileUri);
     })
   );
 

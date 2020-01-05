@@ -71,11 +71,10 @@ export const openNewTab = (fileUri: vscode.Uri) => {
   };
 
   if (fileUri.fsPath.endsWith('.*')) {
-    pickFromListOfFiles(fileUri, errorCallback);
-    return;
+    return pickFromListOfFiles(fileUri, errorCallback);
   }
 
-  vscode.workspace.openTextDocument(fileUri).then((doc) => vscode.window.showTextDocument(doc), errorCallback);
+  return vscode.workspace.openTextDocument(fileUri).then((doc) => vscode.window.showTextDocument(doc), errorCallback);
 };
 
 export const createOrOpenInNewTab = (fileUri: vscode.Uri) => {
@@ -123,16 +122,19 @@ export const showPicker = async (display: PickerDisplay, fileUris: vscode.Uri[])
     quickPick.items = pickerItems;
   });
 
-  quickPick.onDidAccept(async () => {
-    quickPick.selectedItems.forEach((selectedItem) => {
-      const index = pickerItems.findIndex((item) => item === selectedItem);
-      if (index !== -1 && uris[index]) {
-        openNewTab(uris[index]);
-      }
+  return new Promise((resolve) => {
+    quickPick.onDidAccept(async () => {
+      quickPick.selectedItems.forEach(async (selectedItem) => {
+        const index = pickerItems.findIndex((item) => item === selectedItem);
+        if (index !== -1 && uris[index]) {
+          await openNewTab(uris[index]);
+        }
+      });
+      resolve();
     });
-  });
 
-  quickPick.show();
+    quickPick.show();
+  });
 };
 
 const getIndexFileDisplayName = (fileUri: vscode.Uri) =>
@@ -244,14 +246,13 @@ const pickFromListOfFiles = async (fileUri: vscode.Uri, errorCallback: () => voi
 
   if (fileUris.length === 0) {
     errorCallback();
-    return;
+    return Promise.resolve();
   }
   if (fileUris.length === 1) {
-    openNewTab(fileUris[0]);
-    return;
+    return openNewTab(fileUris[0]);
   }
 
-  showPicker(PickerDisplay.Basename, fileUris);
+  return showPicker(PickerDisplay.Basename, fileUris);
 };
 
 const getPickerItemsFromFiles = (display: PickerDisplay, fileUris: vscode.Uri[], filterValue = '') => {
