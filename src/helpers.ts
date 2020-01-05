@@ -77,18 +77,17 @@ export const openNewTab = (fileUri: vscode.Uri) => {
   return vscode.workspace.openTextDocument(fileUri).then((doc) => vscode.window.showTextDocument(doc), errorCallback);
 };
 
-export const createOrOpenInNewTab = (fileUri: vscode.Uri) => {
-  const e = new vscode.WorkspaceEdit();
-  e.createFile(fileUri, { overwrite: false, ignoreIfExists: true });
+export const createOrOpenInNewTab = async (fileUri: vscode.Uri) => {
+  const edit = new vscode.WorkspaceEdit();
+  edit.createFile(fileUri, { overwrite: false, ignoreIfExists: true });
 
-  vscode.workspace.applyEdit(e).then(
-    () => {
-      openNewTab(fileUri);
-    },
-    () => {
-      vscode.window.showErrorMessage(`Failed to create test counterpart`);
-    }
-  );
+  try {
+    await vscode.workspace.applyEdit(edit);
+    return openNewTab(fileUri);
+  } catch (e) {
+    vscode.window.showErrorMessage(`Failed to create test counterpart`);
+    return Promise.resolve();
+  }
 };
 
 export const getCurrentAbsolutePath = () =>
@@ -112,29 +111,26 @@ export const getNextFileWithTheSameFilename = async () => {
   return fileUris[indexOfCurrentFile + 1];
 };
 
-export const showPicker = async (display: PickerDisplay, fileUris: vscode.Uri[]) => {
+export const showPicker = (display: PickerDisplay, fileUris: vscode.Uri[]) => {
   const quickPick = vscode.window.createQuickPick();
   let { uris, pickerItems } = getPickerItemsFromFiles(display, fileUris);
   quickPick.items = pickerItems;
 
-  quickPick.onDidChangeValue(async (filterValue) => {
+  quickPick.onDidChangeValue((filterValue) => {
     ({ uris, pickerItems } = getPickerItemsFromFiles(display, fileUris, filterValue));
     quickPick.items = pickerItems;
   });
 
-  return new Promise((resolve) => {
-    quickPick.onDidAccept(async () => {
-      quickPick.selectedItems.forEach(async (selectedItem) => {
-        const index = pickerItems.findIndex((item) => item === selectedItem);
-        if (index !== -1 && uris[index]) {
-          await openNewTab(uris[index]);
-        }
-      });
-      resolve();
+  quickPick.onDidAccept(() => {
+    quickPick.selectedItems.forEach((selectedItem) => {
+      const index = pickerItems.findIndex((item) => item === selectedItem);
+      if (index !== -1 && uris[index]) {
+        openNewTab(uris[index]);
+      }
     });
-
-    quickPick.show();
   });
+
+  quickPick.show();
 };
 
 const getIndexFileDisplayName = (fileUri: vscode.Uri) =>

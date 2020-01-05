@@ -127,14 +127,22 @@
     "test": "node ./out/test/runTest.js"
   },
   "devDependencies": {
+    "@types/chai": "4.2.7",
     "@types/glob": "7.1.1",
+    "@types/lodash": "4.14.149",
     "@types/mocha": "5.2.7",
     "@types/node": "12.12.14",
+    "@types/sinon": "7.5.1",
     "@types/vscode": "1.40.0",
+    "chai": "4.2.0",
     "glob": "7.1.6",
     "mocha": "6.2.2",
+    "sinon": "8.0.2",
     "tslint": "5.20.1",
     "typescript": "3.7.2",
     "vscode-test": "1.2.3"
+  },
+  "dependencies": {
+    "lodash": "4.17.15"
   }
 }

@@ -33,13 +33,16 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('extension.jumpIndex', async () => {
       const indexFileUris = await getClosestIndexFilePaths();
 
+      if (indexFileUris.length === 1) {
+        return openNewTab(indexFileUris[0]);
+      }
+
       if (indexFileUris.length === 0) {
         vscode.window.showErrorMessage(`Couldn't find an index file`);
-      } else if (indexFileUris.length === 1) {
-        openNewTab(indexFileUris[0]);
       } else {
         vscode.window.showErrorMessage(`Found multiple index files`);
       }
+      return Promise.resolve();
     })
   );
 
@@ -47,6 +50,7 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.commands.registerCommand('extension.listIndex', async () => {
       const fileUris = await getAllIndexFilesInWorkspace();
       showPicker(PickerDisplay.IndexFiles, fileUris);
+      return Promise.resolve();
     })
   );
 
@@ -56,7 +60,7 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (!isTest(activeFileUri)) {
         const testFileUri = getCorrespondingTestFilePath(activeFileUri, true);
-        createOrOpenInNewTab(testFileUri);
+        return createOrOpenInNewTab(testFileUri);
       }
     })
   );
@@ -64,9 +68,10 @@ export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
     vscode.commands.registerCommand('extension.cycleFilename', async () => {
       const nextFileUri = await getNextFileWithTheSameFilename();
-      if (nextFileUri) {
-        createOrOpenInNewTab(nextFileUri);
+      if (!nextFileUri) {
+        return Promise.resolve();
       }
+      return openNewTab(nextFileUri);
     })
   );
 }
