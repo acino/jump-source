@@ -20,11 +20,10 @@ jobs:
     - name: Start xvfb
       run: /usr/bin/Xvfb :99 -screen 0 1024x768x24 > /dev/null 2>&1 &
     - name: npm install, build, and test
-      env:
-        CODE_VERSION: ''
-        DISPLAY: ':99.0'
       run: |
         npm ci
         npm test
       env:
         CI: true
+        CODE_VERSION: ''
+        DISPLAY: ':99.0'
