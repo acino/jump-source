@@ -2,9 +2,9 @@ import * as path from 'path';
 import * as Mocha from 'mocha';
 import * as glob from 'glob';
 import { use } from 'chai';
-import { isEqual } from 'lodash';
+import { isEqual, find } from 'lodash';
 
-import { toAbsolutePath, getEditorAbsolutePath } from '../helpers';
+import { toAbsolutePath, getEditorAbsolutePath } from '../testHelpers';
 
 use((chai) => {
   chai.assert.isOpenInActiveEditor = (...parts) => {
@@ -20,7 +20,12 @@ use((chai) => {
         hasEqualItems = false;
       }
     }
-    chai.assert.isTrue(hasEqualItems);
+    chai.assert.isTrue(hasEqualItems, JSON.stringify({ expected, actual }));
+  };
+
+  chai.assert.notContainsElementMatching = (actual, partial) => {
+    const match = find(actual, partial);
+    chai.assert.isUndefined(match, `Found match: ${JSON.stringify(match)}`);
   };
 });
 

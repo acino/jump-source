@@ -13,10 +13,11 @@ import {
   getAllIndexFilesInWorkspace,
   PickerDisplay
 } from './helpers';
+import { Command } from './constants';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(
-    vscode.commands.registerCommand('extension.jumpTest', () => {
+    vscode.commands.registerCommand(Command.JumpTest, () => {
       const activeFileUri = vscode.window.activeTextEditor.document.uri;
 
       if (isTest(activeFileUri)) {
@@ -30,7 +31,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('extension.jumpIndex', async () => {
+    vscode.commands.registerCommand(Command.JumpIndex, async () => {
       const indexFileUris = await getClosestIndexFilePaths();
 
       if (indexFileUris.length === 1) {
@@ -47,7 +48,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('extension.listIndex', async () => {
+    vscode.commands.registerCommand(Command.ListIndex, async () => {
       const fileUris = await getAllIndexFilesInWorkspace();
       showPicker(PickerDisplay.IndexFiles, fileUris);
       return Promise.resolve();
@@ -55,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('extension.createTest', async () => {
+    vscode.commands.registerCommand(Command.CreateTest, async () => {
       const activeFileUri = vscode.window.activeTextEditor.document.uri;
 
       if (!isTest(activeFileUri)) {
@@ -66,7 +67,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   context.subscriptions.push(
-    vscode.commands.registerCommand('extension.cycleFilename', async () => {
+    vscode.commands.registerCommand(Command.CycleFilename, async () => {
       const nextFileUri = await getNextFileWithTheSameFilename();
       if (!nextFileUri) {
         return Promise.resolve();

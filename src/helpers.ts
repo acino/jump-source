@@ -1,14 +1,7 @@
 import * as vscode from 'vscode';
 import { dirname, basename, join, sep, relative } from 'path';
 
-const EXTENSION_NAME = 'jumpSource';
-const CONF_TEST_FILE_SUFFIX = 'testFileSuffix';
-const CONF_TEST_SUB_FOLDER = 'testSubFolder';
-const CONF_MATCH_EXTENSION = 'matchExtension';
-const CONF_FILTER_CASE_SENSITIVE = 'filterCaseSensitive';
-const CONF_EXCLUDE_PATTERN = 'excludePattern';
-const CONF_TEST_FILE_EXTENSION = 'testFileExtension';
-const SAME_AS_SOURCE = 'sameAsSource';
+import { EXTENSION_NAME, Configuration, TestFileExtension } from './constants';
 
 export type RelativePath = {
   relativeRoot: string;
@@ -215,7 +208,7 @@ const addTestSuffix = (testFilename: string, exact: boolean) => {
     testFilenameParts.push(extension);
   } else if (exact) {
     const extensionSetting = getTestFileExtension();
-    if (extensionSetting === SAME_AS_SOURCE) {
+    if (extensionSetting === TestFileExtension.SameAsSource) {
       testFilenameParts.push(extension);
     } else {
       testFilenameParts.push(extensionSetting);
@@ -268,17 +261,20 @@ const getPickerItemsFromFiles = (display: PickerDisplay, fileUris: vscode.Uri[],
   };
 };
 
-const getTestFileSuffix = (): string => vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_TEST_FILE_SUFFIX);
+const getTestFileSuffix = (): string =>
+  vscode.workspace.getConfiguration(EXTENSION_NAME).get(Configuration.TestFileSuffix);
 
-const getTestSubFolderName = (): string => vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_TEST_SUB_FOLDER);
+const getTestSubFolderName = (): string =>
+  vscode.workspace.getConfiguration(EXTENSION_NAME).get(Configuration.TestSubFolder);
 
-const hasToMatchExtension = (): boolean => vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_MATCH_EXTENSION);
+const hasToMatchExtension = (): boolean =>
+  vscode.workspace.getConfiguration(EXTENSION_NAME).get(Configuration.MatchExtension);
 
 const isFilterCaseSensitive = (): boolean =>
-  vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_FILTER_CASE_SENSITIVE);
+  vscode.workspace.getConfiguration(EXTENSION_NAME).get(Configuration.FilterCaseSensitive);
 
 const getExcludePattern = (): string =>
-  vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_EXCLUDE_PATTERN) || null;
+  vscode.workspace.getConfiguration(EXTENSION_NAME).get(Configuration.ExcludePattern) || null;
 
 const getTestFileExtension = (): string =>
-  vscode.workspace.getConfiguration(EXTENSION_NAME).get(CONF_TEST_FILE_EXTENSION);
+  vscode.workspace.getConfiguration(EXTENSION_NAME).get(Configuration.TestFileExtension);
