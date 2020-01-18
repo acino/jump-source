@@ -1,3 +1,5 @@
+![](https://github.com/acino/jump-source/workflows/Integration%20tests/badge.svg)
+
 # jump-source for VS Code
 
 This extension adds multiple shortcuts for quickly jumping between source files and test files.
