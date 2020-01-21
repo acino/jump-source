@@ -2,7 +2,9 @@
 
 All notable changes to the "jump-source" extension will be documented in this file.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+### 1.4.0
+
+Bug fixes and adjusts semantic versioning. Adds integration tests.
 
 ## 1.3.3
 

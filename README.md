@@ -76,6 +76,10 @@ This command is always case insensitive.
 
 Releases of jumpSource for VS Code.
 
+### 1.4.0
+
+Bug fixes and adjusts semantic versioning. Adds integration tests.
+
 ### 1.3.3
 
 Adds setting for test file extension for cases where the source file and test file have different file extensions.
