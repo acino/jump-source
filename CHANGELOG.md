@@ -2,6 +2,12 @@
 
 All notable changes to the "jump-source" extension will be documented in this file.
 
+### 1.4.1
+
+#### Chore
+
+- Migrates from TSLint to ESLint.
+
 ### 1.4.0
 
 Bug fixes and adjusts semantic versioning. Adds integration tests.
