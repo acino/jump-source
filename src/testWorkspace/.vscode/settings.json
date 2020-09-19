@@ -1,0 +1,8 @@
+{
+    "jumpSource.testFileSuffix": "test",
+    "jumpSource.testSubFolder": "tests",
+    "jumpSource.filterCaseSensitive": false,
+    "jumpSource.excludePattern": "**/node_modules/**",
+    "jumpSource.matchExtension": true,
+    "jumpSource.testFileExtension": "sameAsSource"
+}

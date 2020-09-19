@@ -126,10 +126,7 @@ export const showPicker = (display: PickerDisplay, fileUris: vscode.Uri[]) => {
   quickPick.show();
 };
 
-const getIndexFileDisplayName = (fileUri: vscode.Uri) =>
-  dirname(fileUri.fsPath)
-    .split(sep)
-    .pop();
+const getIndexFileDisplayName = (fileUri: vscode.Uri) => dirname(fileUri.fsPath).split(sep).pop();
 
 const findFilesCaseInsensitive = async (folder: string, filenameWithoutExtension: string) =>
   await vscode.workspace
@@ -139,7 +136,8 @@ const findFilesCaseInsensitive = async (folder: string, filenameWithoutExtension
         (fileUri) =>
           filenameWithoutExtension.toLowerCase() === getFilenameWithoutExtension(fileUri.fsPath).toLowerCase()
       )
-    );
+    )
+    .then((files) => files.sort());
 
 export const getAllIndexFilesInWorkspace = async () => {
   const currentAbsolutePath = getCurrentAbsolutePath();
