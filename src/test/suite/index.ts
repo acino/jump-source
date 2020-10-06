@@ -34,7 +34,6 @@ export function run(): Promise<void> {
   const mocha = new Mocha({
     ui: 'bdd'
   });
-  mocha.useColors(true);
 
   const testsRoot = path.resolve(__dirname, '..');
 
@@ -56,8 +55,8 @@ export function run(): Promise<void> {
             c();
           }
         });
-      } catch (err) {
-        e(err);
+      } catch (error) {
+        e(error);
       }
     });
   });

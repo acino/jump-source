@@ -1,17 +1,8 @@
 import * as vscode from 'vscode';
 import { dirname, basename, join, sep, relative } from 'path';
+import { orderBy } from 'lodash';
 
-import { EXTENSION_NAME, Configuration, TestFileExtension } from './constants';
-
-export type RelativePath = {
-  relativeRoot: string;
-  displayName: string;
-};
-
-export enum PickerDisplay {
-  Basename,
-  IndexFiles
-}
+import { EXTENSION_NAME, Configuration, TestFileExtension, PickerDisplay } from './constants';
 
 export const isTest = (uri: vscode.Uri) => {
   const re = new RegExp(`\\.${getTestFileSuffix()}\\.(\\w+|\\*)`);
@@ -44,12 +35,15 @@ export const getClosestIndexFilePaths = async () => {
 
   const pattern = new vscode.RelativePattern(absoluteFolderPath, 'index.*');
 
-  const absolutePaths = await vscode.workspace.findFiles(pattern).then((files) =>
-    files.filter((fileUri) => {
-      const filename = basename(fileUri.fsPath);
-      return /^index\.[^\.]+$/.test(filename);
-    })
-  );
+  const absolutePaths = await vscode.workspace
+    .findFiles(pattern)
+    .then((files) =>
+      files.filter((fileUri) => {
+        const filename = basename(fileUri.fsPath);
+        return /^index\.[^\.]+$/.test(filename);
+      })
+    )
+    .then((files) => files.sort());
 
   return absolutePaths;
 };
@@ -255,7 +249,10 @@ const getPickerItemsFromFiles = (display: PickerDisplay, fileUris: vscode.Uri[],
 
   return {
     uris: filteredUris,
-    pickerItems
+    pickerItems: orderBy(pickerItems, [
+      (pickerItem) => pickerItem.label.toLowerCase(),
+      (pickerItem) => pickerItem.detail.toLowerCase()
+    ])
   };
 };
 

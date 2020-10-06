@@ -10,10 +10,9 @@ import {
   createOrOpenInNewTab,
   getNextFileWithTheSameFilename,
   showPicker,
-  getAllIndexFilesInWorkspace,
-  PickerDisplay
+  getAllIndexFilesInWorkspace
 } from './helpers';
-import { Command } from './constants';
+import { Command, PickerDisplay } from './constants';
 
 export function activate(context: vscode.ExtensionContext) {
   context.subscriptions.push(

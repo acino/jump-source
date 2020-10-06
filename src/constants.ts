@@ -20,3 +20,13 @@ export enum Command {
   CreateTest = 'extension.createTest',
   CycleFilename = 'extension.cycleFilename'
 }
+
+export type RelativePath = {
+  relativeRoot: string;
+  displayName: string;
+};
+
+export enum PickerDisplay {
+  Basename,
+  IndexFiles
+}
