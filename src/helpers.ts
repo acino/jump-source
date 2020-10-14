@@ -106,6 +106,7 @@ export const showPicker = (display: PickerDisplay, fileUris: vscode.Uri[]) => {
   quickPick.onDidChangeValue((filterValue) => {
     ({ uris, pickerItems } = getPickerItemsFromFiles(display, fileUris, filterValue));
     quickPick.items = pickerItems;
+    return pickerItems; // For test
   });
 
   quickPick.onDidAccept(() => {
@@ -151,20 +152,18 @@ const convertToRelative = (fileUri: vscode.Uri) => {
 };
 
 const filterByValue = (fileUris: vscode.Uri[], filterValue: string) =>
-  isFilterCaseSensitive()
-    ? fileUris.filter((fileUri) => {
-        const displayName = getIndexFileDisplayName(fileUri);
-        let start = 0;
-        for (let i = 0; i < filterValue.length; i++) {
-          const index = displayName.indexOf(filterValue.charAt(i), start);
-          if (index === -1) {
-            return false;
-          }
-          start = index + 1;
-        }
-        return true;
-      })
-    : fileUris;
+  fileUris.filter((fileUri) => {
+    const displayName = getIndexFileDisplayName(fileUri);
+    let start = 0;
+    for (let i = 0; i < filterValue.length; i++) {
+      const index = isFilterCaseSensitive() ? displayName.indexOf(filterValue.charAt(i), start) : displayName.toLowerCase().indexOf(filterValue.charAt(i).toLowerCase(), start);
+      if (index === -1) {
+        return false;
+      }
+      start = index + 1;
+    }
+    return true;
+  });
 
 const getParentDir = (dirPath: string) => {
   const subFolderName = getTestSubFolderName();

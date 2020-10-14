@@ -20,12 +20,12 @@ use((chai) => {
         hasEqualItems = false;
       }
     }
-    chai.assert.isTrue(hasEqualItems, JSON.stringify({ expected, actual }));
+    chai.assert.isTrue(hasEqualItems, JSON.stringify({ expected, actual }, null, 2));
   };
 
   chai.assert.notContainsElementMatching = (actual, partial) => {
     const match = find(actual, partial);
-    chai.assert.isUndefined(match, `Found match: ${JSON.stringify(match)}`);
+    chai.assert.isUndefined(match, `Found match: ${JSON.stringify(match, null, 2)}`);
   };
 });
 

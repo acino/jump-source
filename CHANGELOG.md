@@ -4,9 +4,12 @@ All notable changes to the "jump-source" extension will be documented in this fi
 
 ### 1.4.1
 
+Fixes sorting of quick pickers.
+
 #### Chore
 
 - Migrates from TSLint to ESLint.
+- Updates dependencies.
 
 ### 1.4.0
 
