@@ -26,11 +26,7 @@ export const deleteFolder = (...parts: string[]) => {
   if (!existsSync(folderPath)) {
     return;
   }
-  const files = readdirSync(folderPath);
-  for (const file of files) {
-    unlinkSync(path.join(folderPath, file));
-  }
-  rmdirSync(folderPath);
+  rmdirSync(folderPath, { recursive: true });
 };
 
 export const setWorkspaceConfiguration = (key: Configuration, value: string | boolean) =>

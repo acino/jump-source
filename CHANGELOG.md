@@ -2,6 +2,10 @@
 
 All notable changes to the "jump-source" extension will be documented in this file.
 
+### 1.4.2.
+
+Fixes bug where the wrong file was opened when listing index files.
+
 ### 1.4.1
 
 Fixes sorting of quick pickers.

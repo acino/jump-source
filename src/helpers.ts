@@ -156,7 +156,9 @@ const filterByValue = (fileUris: vscode.Uri[], filterValue: string) =>
     const displayName = getIndexFileDisplayName(fileUri);
     let start = 0;
     for (let i = 0; i < filterValue.length; i++) {
-      const index = isFilterCaseSensitive() ? displayName.indexOf(filterValue.charAt(i), start) : displayName.toLowerCase().indexOf(filterValue.charAt(i).toLowerCase(), start);
+      const index = isFilterCaseSensitive()
+        ? displayName.indexOf(filterValue.charAt(i), start)
+        : displayName.toLowerCase().indexOf(filterValue.charAt(i).toLowerCase(), start);
       if (index === -1) {
         return false;
       }
@@ -246,12 +248,17 @@ const getPickerItemsFromFiles = (display: PickerDisplay, fileUris: vscode.Uri[],
     return quickPickItem;
   });
 
+  const combinedForSorting = orderBy(
+    pickerItems.map((pickerItem, i) => ({
+      uri: filteredUris[i],
+      pickerItem
+    })),
+    [(entry) => entry.pickerItem.label.toLowerCase(), (entry) => entry.pickerItem.detail.toLowerCase()]
+  );
+
   return {
-    uris: filteredUris,
-    pickerItems: orderBy(pickerItems, [
-      (pickerItem) => pickerItem.label.toLowerCase(),
-      (pickerItem) => pickerItem.detail.toLowerCase()
-    ])
+    uris: combinedForSorting.map((entry) => entry.uri),
+    pickerItems: combinedForSorting.map((entry) => entry.pickerItem)
   };
 };
 
