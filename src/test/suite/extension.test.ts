@@ -95,6 +95,25 @@ describe('Integration tests', function () {
       assert.isTrue(createQuickPickSpy.calledOnce);
       assert.hasEqualItems(actualQuickPickItems, expectedQuickPickItems);
     });
+
+    it('should be able to locate tests in a mirrored directory structure', async () => {
+      await setWorkspaceConfiguration(Configuration.TestSubFolder, '');
+      await setWorkspaceConfiguration(Configuration.TestFileSuffix, 'spec');
+      await setWorkspaceConfiguration(Configuration.RelativeRoots, ['withMirrored', 'mirrored/tests']);
+      await openFileInEditor('withMirrored/code.ts');
+      await executeCommand(Command.JumpTest);
+
+      assert.isOpenInActiveEditor('mirrored/tests', 'code.spec.ts');
+    });
+
+    it('should be able to locate code in a mirrored directory structure', async () => {
+      await setWorkspaceConfiguration(Configuration.TestFileSuffix, 'spec');
+      await setWorkspaceConfiguration(Configuration.RelativeRoots, ['withMirrored', 'mirrored']);
+      await openFileInEditor('mirrored/tests/code.spec.ts');
+      await executeCommand(Command.JumpTest);
+
+      assert.isOpenInActiveEditor('withMirrored', 'code.ts');
+    });
   });
 
   describe('jumpIndex command', function () {

@@ -4,5 +4,6 @@
     "jumpSource.filterCaseSensitive": false,
     "jumpSource.excludePattern": "**/node_modules/**",
     "jumpSource.matchExtension": true,
-    "jumpSource.testFileExtension": "sameAsSource"
+    "jumpSource.testFileExtension": "sameAsSource",
+    "jumpSource.relativeRoots": []
 }

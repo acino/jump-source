@@ -29,11 +29,11 @@ export const deleteFolder = (...parts: string[]) => {
   rmdirSync(folderPath, { recursive: true });
 };
 
-export const setWorkspaceConfiguration = (key: Configuration, value: string | boolean) =>
+export const setWorkspaceConfiguration = (key: Configuration, value: string | boolean | string[]) =>
   vscode.workspace.getConfiguration(EXTENSION_NAME).update(key, value);
 
 interface WorkspaceValue {
-  [key: string]: string | boolean;
+  [key: string]: string | boolean | string[];
 }
 
 export const enforceDefaultConfiguration = async () => {

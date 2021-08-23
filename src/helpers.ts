@@ -1,6 +1,6 @@
 import * as vscode from 'vscode';
 import { dirname, basename, join, sep, relative } from 'path';
-import { orderBy } from 'lodash';
+import { orderBy, trim } from 'lodash';
 
 import { EXTENSION_NAME, Configuration, TestFileExtension, PickerDisplay } from './constants';
 
@@ -10,7 +10,7 @@ export const isTest = (uri: vscode.Uri) => {
 };
 
 export const getCorrespondingSourceFilePath = (testFileUri: vscode.Uri) => {
-  const absoluteSourceDir = getParentDir(dirname(testFileUri.fsPath));
+  const absoluteSourceDir = replaceWithCodeRoot(testFileUri.fsPath);
   const sourceFilename = removeTestSuffix(basename(testFileUri.fsPath));
 
   const absolutePath = join(absoluteSourceDir, sourceFilename);
@@ -18,7 +18,7 @@ export const getCorrespondingSourceFilePath = (testFileUri: vscode.Uri) => {
 };
 
 export const getCorrespondingTestFilePath = (sourceFileUri: vscode.Uri, exact = false) => {
-  const absoluteTestDir = join(dirname(sourceFileUri.fsPath), getTestSubFolderName());
+  const absoluteTestDir = join(replaceWithTestsRoot(sourceFileUri.fsPath), getTestSubFolderName());
   const testFilename = addTestSuffix(basename(sourceFileUri.fsPath), exact);
 
   const absolutePath = join(absoluteTestDir, testFilename);
@@ -262,11 +262,57 @@ const getPickerItemsFromFiles = (display: PickerDisplay, fileUris: vscode.Uri[],
   };
 };
 
+const replaceWithTestsRoot = (filename: string) => {
+  const { code, tests } = getRelativeRoots();
+
+  const folder = dirname(filename);
+
+  if (!code && !tests) {
+    return folder;
+  }
+
+  if (!code) {
+    return join(tests, folder);
+  }
+
+  // Example:
+  // ['withMirrored', 'mirrored/tests']
+  // withMirrored/code.ts
+  // mirrored/tests/code.spec.ts
+  return folder.replace(code, tests);
+};
+
+const replaceWithCodeRoot = (filename: string) => {
+  const { code, tests } = getRelativeRoots();
+
+  const folder = getParentDir(dirname(filename));
+
+  if (!code && !tests) {
+    return folder;
+  }
+
+  if (!code) {
+    return join(tests, folder);
+  }
+
+  // Example:
+  // ['withMirrored', 'mirrored/tests']
+  // withMirrored/code.ts
+  // mirrored/tests/code.spec.ts
+  return folder.replace(tests, code);
+};
+
 const getTestFileSuffix = (): string =>
   vscode.workspace.getConfiguration(EXTENSION_NAME).get(Configuration.TestFileSuffix);
 
 const getTestSubFolderName = (): string =>
   vscode.workspace.getConfiguration(EXTENSION_NAME).get(Configuration.TestSubFolder);
+
+const getRelativeRoots = (): { code?: string; tests?: string } => {
+  const relativeRoots: string[] = vscode.workspace.getConfiguration(EXTENSION_NAME).get(Configuration.RelativeRoots);
+  const [code, tests] = relativeRoots;
+  return { code: trim(code, '/').replace('/', '\\'), tests: trim(tests, '/').replace('/', '\\') };
+};
 
 const hasToMatchExtension = (): boolean =>
   vscode.workspace.getConfiguration(EXTENSION_NAME).get(Configuration.MatchExtension);

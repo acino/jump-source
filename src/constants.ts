@@ -3,6 +3,7 @@ export const EXTENSION_NAME = 'jumpSource';
 export enum Configuration {
   TestFileSuffix = 'testFileSuffix',
   TestSubFolder = 'testSubFolder',
+  RelativeRoots = 'relativeRoots',
   MatchExtension = 'matchExtension',
   FilterCaseSensitive = 'filterCaseSensitive',
   ExcludePattern = 'excludePattern',

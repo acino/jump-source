@@ -2,6 +2,10 @@
 
 All notable changes to the "jump-source" extension will be documented in this file.
 
+### 1.4.3.
+
+Adds support for finding tests in a directory structure which mirrors the directory structure of the code. See the `relativeRoots` setting. https://github.com/acino/jump-source/issues/6
+
 ### 1.4.2.
 
 Fixes bug where the wrong file was opened when listing index files.

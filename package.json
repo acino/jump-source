@@ -1,7 +1,7 @@
 {
   "name": "jump-source",
   "displayName": "jump-source for VS Code",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "publisher": "Acino",
   "description": "Shortcuts to jump between source files and test files",
   "author": {
@@ -102,6 +102,11 @@
           "type": "string",
           "default": "tests",
           "description": "Name of sub folder containing tests (may be empty)."
+        },
+        "jumpSource.relativeRoots": {
+          "type": "array",
+          "default": [],
+          "description": "Use when the tests are in a directory structure which mirrors the code directory structure. The array should contain the root of the code tree and test tree relative to the project root. E.g. src/app/code.ts and someFolder/tests/app/code.spec.ts would require ['src', 'someFolder/tests']."
         },
         "jumpSource.filterCaseSensitive": {
           "type": "boolean",
