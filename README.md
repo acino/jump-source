@@ -30,6 +30,7 @@ This extension contributes the following settings:
 
 - `jumpSource.testFileSuffix`: Suffix to append to source file name before the file extension (default: test).
 - `jumpSource.testSubFolder`: Name of sub folder containing tests (default: tests).
+- `jumpSource.relativeRoots`: Use when the tests are in a directory structure which mirrors the code directory structure.
 - `jumpSource.matchExtension`: When set to `true` the extension of the source file and test file have to match. When set to `false` a context menu will be shown if necessary (default: `true`).
 - `jumpSource.filterCaseSensitive`: Used when index files are listed. When set to true the filter will exclude results with the wrong case (default: true).
 - `jumpSource.excludePattern`: Used when index files are listed. This glob pattern is ignored in the file search.
@@ -42,6 +43,8 @@ Set `jumpSource.testSubFolder` to empty string if your tests reside within the s
 
 1. Open a source file that has a corresponding test file, or a test file.
 2. Open the command palette with Ctrl + Shift + P and choose the Jump to/from test command. You may also use the keyboard shortcut Ctrl + O T.
+
+If your tests are located in a separate directory tree that mirrors the code directories you need to use the setting `jumpSource.relativeRoots`.
 
 ### Jumping to the closest index file
 

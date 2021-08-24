@@ -1,7 +1,7 @@
 {
   "name": "jump-source",
   "displayName": "jump-source for VS Code",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "publisher": "Acino",
   "description": "Shortcuts to jump between source files and test files",
   "author": {
